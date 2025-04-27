@@ -1,6 +1,6 @@
 {
   "name": "@himojuku/epub-constructor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This is a react library that creates an epub structure. This library only provides the file structure. To get a valid epub file it is needed to to create files from the provided data and compress them to a epub file.",
   "main": "index.ts",
   "repository": {
@@ -21,6 +21,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "node-html-parser": "^7.0.1",
     "sanitize-html": "^2.13.0"
   },
   "author": "Alen Toma & Patrick Loser & HimoJuku",
