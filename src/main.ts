@@ -1,7 +1,6 @@
 import { File, EpubSettings, InternalEpubChapter } from "../types";
 import {
   createFile,
-  sleep,
   getImageType,
   removeFileExtension,
   setChapterFileNames,
@@ -24,7 +23,6 @@ import {
   defaultHtmlToc,
   defaultNcxToc,
 } from "./constructors/defaultsConstructor";
-import { EpubSettingsLoader } from "./loader/EpubSettingsLoader";
 
 export default class EpubFile {
   epubSettings: EpubSettings;
@@ -42,14 +40,10 @@ export default class EpubFile {
    * @returns An array of File objects representing the files in the EPUB.
    * @throws Error if the EPUB file needs at least one chapter.
    */
-  public async constructEpub(
-    localOnProgress?: (progress: number) => Promise<void>
-  ): Promise<File[]> {
+  public async constructEpub(): Promise<File[]> {
     const files: File[] = [];
     const manifest: string[] = [];
     const spine: string[] = [];
-    let dProgress = 0;
-
     if (
       !this.epubSettings.chapters ||
       this.epubSettings.chapters.length === 0
@@ -73,7 +67,6 @@ export default class EpubFile {
       files.push(createFile(coverFilePath, this.epubSettings.cover, true));
       manifest.push(manifestCover(fileType));
     }
-
     files.push(
       createFile(
         "META-INF/container.xml",
@@ -85,7 +78,6 @@ export default class EpubFile {
         `function fnEpub(){${this.epubSettings.js ?? ""}}`
       )
     );
-
     let epub = defaultEpub();
     let ncxToc = defaultNcxToc(
       this.epubSettings.chapters.length,
@@ -104,11 +96,9 @@ export default class EpubFile {
 
     for (let index = 0; index < len; index++) {
       const chapter = this.epubSettings.chapters[index] as InternalEpubChapter;
-      dProgress = (index / len) * 100;
 
       let imageIndex = 0;
       const idRef = `${sanitizeFileName(chapter.title)}_image_${imageIndex}`;
-
       chapter.htmlBody = chapter.htmlBody
         .replace(/(?<=<img[^>]+src=(?:\"|')).+?(?=\"|')/gi, (uri: string) => {
           imageIndex++;
@@ -121,27 +111,18 @@ export default class EpubFile {
         .replace(/\&nbsp/g, "")
         .replace(/(<img[^>]+>)(?!\s*<\/img>)/g, "$1</img>")
         .replace(/<\/?(?:html|head|body|input)[^>]*>/g, "");
-
       manifest.push(manifestChapter(idRef, chapter.fileName));
       files.push(createChapter(chapter));
       spine.push(`<itemref idref="${idRef}" ></itemref>`);
       ol.push(`<li><a href="${chapter.fileName}">${chapter.title}</a></li>`);
       navMap.push(
-        `<navPoint id="${idRef}" playOrder="${index + 1}"> 
-          <navLabel> 
+        `<navPoint id="${idRef}" playOrder="${index + 1}">
+          <navLabel>
             <text>${chapter.title}</text>
           </navLabel> <content src="${chapter.fileName}" />
         </navPoint>`
       );
-
-      if (localOnProgress && index % 300 === 0) {
-        await sleep(0);
-      }
-      if (localOnProgress) {
-        await localOnProgress(dProgress);
-      }
     }
-
     manifest.push(manifestNav(), manifestStyle(), manifestToc());
 
     epub = epub
@@ -150,7 +131,6 @@ export default class EpubFile {
       .replace("#metadata", metadata);
     ncxToc = ncxToc.replace("#navMap", navMap.join("\n"));
     htmlToc = htmlToc.replace("#ol", ol.join("\n"));
-
     files.push(
       createFile(`EPUB/${this.epubSettings.fileName}.opf`, epub),
       createFile("EPUB/toc.xhtml", htmlToc),
@@ -158,19 +138,6 @@ export default class EpubFile {
       createFile("mimetype", "application/epub+zip")
     );
 
-    if (localOnProgress) {
-      await localOnProgress(len);
-    }
-
     return files;
   }
-
-  /**
-   * Extracts EPUB settings from an existing EPUB file.
-   * @param file An array of File objects representing the files in the EPUB.
-   * @returns The extracted EPUB settings.
-   */
-  // static async load(file: File[]): Promise<EpubSettings> {
-  //   return await EpubSettingsLoader(file);
-  // }
 }

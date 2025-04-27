@@ -1,6 +1,6 @@
 {
   "name": "@himojuku/epub-constructor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This is a react library that creates an epub structure. This library only provides the file structure. To get a valid epub file it is needed to to create files from the provided data and compress them to a epub file.",
   "main": "index.ts",
   "repository": {
