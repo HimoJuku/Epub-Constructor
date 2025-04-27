@@ -1,12 +1,14 @@
 # Epub-Constructor
 
-This is a typescript library that create an epub structor. This library dose not save the structored epub file, you have to do that your self.
-This library work for react, react-native and web.
-It simple create a structored epub object that you could save it to your desired location later on.
+This library is forked from [epub-constructor](https://github.com/CD-Z/react-native-epub-creator) and depends on the [react-native-epub-creator](https://github.com/HimoJuku/react-native-epub-creator) for construct the epub files.
+
+Specifically, it provides the necessary methods to create the epub file structure and generate the required files, such as `mimetype`, `META-INF/container.xml`, and `EPUB/package.opf`. It also includes methods for creating the HTML files for each chapter and generating the table of contents (TOC) in both HTML and NCX formats.
+
+We aims to fix the upstream library and make it work with the latest version of React Native.
 
 ### Install
 
-`npm install @cd-z/epub-constructor`
+`npm install @himojuku/epub-constructor`
 
 ### How to use
 
@@ -67,6 +69,3 @@ var epub = new EpubFile(settings);
 var file = await epub.constructEpub();
 // save the file to your device
 ```
-
-This library is new and it may containe some bugs so please report those.
-Will be glad if someone is able to create an android and IOS modules that can create the actual epub(zip) file

@@ -42,7 +42,7 @@ export function isValid(file: File[], content: string[]): boolean {
  * @returns A Promise that resolves after the specified time with the provided arguments.
  */
 export function sleep(time: number, args?: any) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       resolve(args);
     }, time);
@@ -135,23 +135,6 @@ export function removeFileExtension(name: string) {
   return name.replace(/(.*)(\.opf|\.epub)/, '$1');
 }
 
-/**
- * Validates the uniqueness of a file name within an array of chapters.
- * If the file name already exists, a number is appended to it to make it unique.
- *
- * @param fileName - The file name to be validated.
- * @param chapters - An array of chapters to check for existing file names.
- * @returns A unique file name.
- */
-function validateName(fileName: string, chapters: EpubChapter[]) {
-  var i = 0;
-  while (chapters.find(a => a.fileName == fileName)) {
-    i++;
-    fileName += i;
-  }
-
-  return fileName;
-}
 
 /**
  * Removes all non-word and non-space characters from a given file name.
@@ -165,7 +148,7 @@ function validateName(fileName: string, chapters: EpubChapter[]) {
  * console.log(sanitizedFileName); // Output: "my_filetxt"
  */
 export function sanitizeFileName(fileName: string) {
-  return fileName.replaceAll(' ', '_').replace(/[^\w]/gi, ''); // remove all non-word and non-space characters
+  return fileName.replace(/ /g, '_').replace(/[^\w]/gi, ''); // remove all non-word and non-space characters
 }
 
 /**
@@ -194,17 +177,16 @@ export function setChapterFileNames(
     newChapter.fileName = sanitizeFileName(newChapter.fileName);
     return newChapter;
   });
+  
   return sanitizedChapters.map((chapter: InternalEpubChapter, i: number) => {
-    let fileName =
-      'content/' + chapter.fileName.replaceAll(' ', '_') + '.xhtml';
-    let j = 1;
-    while (usedNames.has(fileName)) {
-      fileName = fileName.replace(/(\d+)?\.xhtml$/, `${j}.xhtml`);
-      j++;
-    }
+    let fileName = `content/${i}.xhtml`;
+
     usedNames.add(fileName);
     chapter.fileName = fileName;
-
     return chapter;
   });
 }
+function setTimeout(arg0: () => void, time: number) {
+  throw new Error('Function not implemented.');
+}
+
