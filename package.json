@@ -17,6 +17,9 @@
     "epub-creator",
     "epub-constructor"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "sanitize-html": "^2.13.0"
   },
